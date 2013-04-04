@@ -1,0 +1,7 @@
+/* Ace Editor */
+#your_editor, #friend_editor { 
+  top: 50;
+  width: 500px;
+  height: 300px;
+  position: relative;
+}
