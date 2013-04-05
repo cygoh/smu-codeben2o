@@ -1,4 +1,3 @@
-<%@ taglib prefix="janrain" uri="http://janrain4j.googlecode.com/tags" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -25,37 +24,6 @@
     <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
     <link rel="shortcut icon" href="assets/ico/favicon.png">
     
-    <!-- Janrain start -->
-    <script type="text/javascript">
-	(function() {
-	    if (typeof window.janrain !== 'object') window.janrain = {};
-	    if (typeof window.janrain.settings !== 'object') window.janrain.settings = {};
-	    
-	    janrain.settings.tokenUrl = 'www.codeben2o.elasticbeanstalk.com/janrainServlet';
-	
-	    function isReady() { janrain.ready = true; };
-	    if (document.addEventListener) {
-	      document.addEventListener("DOMContentLoaded", isReady, false);
-	    } else {
-	      window.attachEvent('onload', isReady);
-	    }
-	
-	    var e = document.createElement('script');
-	    e.type = 'text/javascript';
-	    e.id = 'janrainAuthWidget';
-	
-	    if (document.location.protocol === 'https:') {
-	      e.src = 'https://rpxnow.com/js/lib/codeben2o/engage.js';
-	    } else {
-	      e.src = 'http://widget-cdn.rpxnow.com/js/lib/codeben2o/engage.js';
-	    }
-	
-	    var s = document.getElementsByTagName('script')[0];
-	    s.parentNode.insertBefore(e, s);
-	})();
-	</script>
-    <!-- Janrain end -->
-    
     <!-- Google Analytics Tracking Code -->
     <script type="text/javascript">
 	  var _gaq = _gaq || [];
@@ -67,23 +35,21 @@
 	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	  })();
-	</script>                           
+	</script>
   </head>
 
   <body>
+
     <div class="container">
       <jsp:include page="header.html"></jsp:include>
+      
       <!-- Jumbotron -->
       <div class="jumbotron">
-        <h1>Coding. Made Social</h1>
-        <p class="lead">Feeling the loneliness of coding alone? Ever dream of having a platform where you can program with your friends? 
-        We offers a Pair-Based programming platform just for you. Grab your friends and join in the fun today.</p>
-        <p>This site is under development. We welcome feedback on the site layout via the Contact Us page. Thank you!</p>
-        <janrain:signInLink styleClass="btn btn-large btn-success">Get started today</janrain:signInLink>
-      </div>
-      
+	  	<h2>We are under development</h2>
+        <p class="lead">Thank you for expressing an interest by signing up with us. We are still in the process of development. Stay tuned to us. We will notify you once the site is up</p>
+	  </div>
+	  
       <hr>
-      <janrain:signInOverlay />
       
       <jsp:include page="footer.html"></jsp:include>
     </div> <!-- /container -->
@@ -104,6 +70,6 @@
     <script src="assets/js/bootstrap-collapse.js"></script>
     <script src="assets/js/bootstrap-carousel.js"></script>
     <script src="assets/js/bootstrap-typeahead.js"></script>
-    
+
   </body>
 </html>

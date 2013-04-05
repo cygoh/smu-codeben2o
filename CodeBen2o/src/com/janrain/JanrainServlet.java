@@ -46,7 +46,6 @@ public class JanrainServlet extends HttpServlet {
         
         // Get the EngageService
         EngageService engageService = EngageServiceFactory.getEngageService();
-        response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
         try {
@@ -56,17 +55,10 @@ public class JanrainServlet extends HttpServlet {
             String identifier = profile.getIdentifier();
             String result = userDataResponse.getResponseAsJSON();
             
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Janrain Response Test</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println(result);
-            out.println("</body>");
-            out.println("</html>");
             // TODO Retrieve more user data like name, email, friends, ...
 
             // TODO Do something with the retrieved user data 
+            response.sendRedirect("/construction.jsp");
         }
         catch (EngageFailureException e) {
             // TODO
