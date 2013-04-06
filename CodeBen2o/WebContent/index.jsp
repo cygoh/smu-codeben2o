@@ -31,7 +31,7 @@
 	    if (typeof window.janrain !== 'object') window.janrain = {};
 	    if (typeof window.janrain.settings !== 'object') window.janrain.settings = {};
 	    
-	    janrain.settings.tokenUrl = 'www.codeben2o.elasticbeanstalk.com/janrainServlet';
+	    janrain.settings.tokenUrl = 'www.codeben2o.elasticbeanstalk.com/JanrainServlet';
 	
 	    function isReady() { janrain.ready = true; };
 	    if (document.addEventListener) {
@@ -73,6 +73,7 @@
   <body>
     <div class="container">
       <jsp:include page="header.html"></jsp:include>
+      
       <!-- Jumbotron -->
       <div class="jumbotron">
         <h1>Coding. Made Social</h1>
@@ -81,8 +82,7 @@
         <p>This site is under development. We welcome feedback on the site layout via the Contact Us page. Thank you!</p>
         <janrain:signInLink styleClass="btn btn-large btn-success">Get started today</janrain:signInLink>
       </div>
-      
-      <hr>
+
       <janrain:signInOverlay />
       
       <jsp:include page="footer.html"></jsp:include>

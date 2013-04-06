@@ -45,8 +45,6 @@
       
 	  <iframe src="https://docs.google.com/a/smu.edu.sg/spreadsheet/embeddedform?formkey=dHMtS1RLbHEzM05kbzEtbjJGbWlpSHc6MQ" width="760" height="420" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
 	  
-      <hr>
-      
       <jsp:include page="footer.html"></jsp:include>
     </div> <!-- /container -->
 

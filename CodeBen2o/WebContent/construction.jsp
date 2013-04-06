@@ -48,9 +48,7 @@
 	  	<h2>We are under development</h2>
         <p class="lead">Thank you for expressing an interest by signing up with us. We are still in the process of development. Stay tuned to us. We will notify you once the site is up</p>
 	  </div>
-	  
-      <hr>
-      
+
       <jsp:include page="footer.html"></jsp:include>
     </div> <!-- /container -->
 

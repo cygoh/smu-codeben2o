@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app>
+<html lang="en" ng-app="myApp">
   <head>
     <meta charset="utf-8">
     <title>Code Ben2o - Social Programming </title>
@@ -26,7 +26,10 @@
     <link rel="shortcut icon" href="assets/ico/favicon.png">
     
     <!-- Angular JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.5/angular.min.js"></script>
+    <script src="assets/lib/angular/angular.js"></script>
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/lib/angular/angular-resource.js"></script>
+    <script src="assets/lib/angular/angular-ace.js"></script>
     
     <!-- Google Analytics Tracking Code -->
     <script type="text/javascript">
@@ -39,23 +42,56 @@
 	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	  })();
-	</script>                           
+	</script> 
+	
+	<script language="javascript" type="text/javascript">
+		angular.module('myApp', ['ngResource','ace']);
+		function ctrl($scope, $resource) {
+			$scope.solution = "";
+			$scope.tests = "assertEquals(10,a);\nassertEquals(3,c);";
+			
+			//For the loadbalancer version with fewer options. 
+	        $scope.VerifierModel = $resource('http://ec2-54-251-193-188.ap-southeast-1.compute.amazonaws.com/:language',
+	        		{},{'get': {method: 'JSONP', isArray: false, params:{vcallback: 'JSON_CALLBACK'}}
+	        		});
+			
+			$scope.verify = function() {
+				$scope.solution = your_editor.getSession().getValue();
+				data = {"solution": "", "tests": ""};
+				data.solution = $scope.solution;
+				data.tests = $scope.tests;
+				jsonrequest = btoa(JSON.stringify(data));
+				$scope.status = "Verifying";
+				
+				$scope.language = "java";
+				
+				$scope.VerifierModel.get({'language':$scope.language,
+					'jsonrequest':jsonrequest},
+					function(response) { 
+						$scope.result = response;
+						$scope.status = "Ready";
+					});  
+			};
+		}
+	</script>                          
   </head>
 
-  <body>
+  <body ng-controller="ctrl">
     <div class="container">
       <jsp:include page="header.html"></jsp:include>
-      <p>Questions set:</p>
-      <p>Task for you:</p>
-      <p>Task for friend:</p>
+     
+      <div class="problem_statement">
+      	<p>Problem statement:</p>
+      	Status: {{status}}
+		Result: {{result}}
+      </div>
       
       <h6>My code editor</h6>
-      <div id="your_editor">** insert your code here **</div>
+      <div id="my_editor">**insert**</div>
+      <a class="btn btn-small" ng-click="verify()">Verify your code</a>
       
-      <h6>Friend's code editor [Read Only]</h6>
+      <h6>Friend's code editor</h6>
       <div id="friend_editor"></div>
-      
-      <hr>
       
       <jsp:include page="footer.html"></jsp:include>
     </div> <!-- /container -->
@@ -81,12 +117,12 @@
     ================================================== -->
     <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script>
-    	var your_editor = ace.edit("your_editor");
-    	your_editor.setTheme("ace/theme/monokai");
-    	your_editor.getSession().setMode("ace/mode/java");
+    	var your_editor = ace.edit("my_editor");
+    	your_editor.setTheme("ace/theme/merbivore_soft");
+    	your_editor.getSession().setMode("ace/mode/javascript");
     	
     	var friend_editor = ace.edit("friend_editor");
-    	friend_editor.setTheme("ace/theme/monokai");
+    	friend_editor.setTheme("ace/theme/merbivore_soft");
     	friend_editor.getSession().setMode("ace/mode/java");
     	friend_editor.setReadOnly(true);
 	</script>

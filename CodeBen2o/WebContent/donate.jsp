@@ -50,8 +50,6 @@
         However, this feature is still in the midst of development.</p>
 	  </div>
 	  
-      <hr>
-      
       <jsp:include page="footer.html"></jsp:include>
     </div> <!-- /container -->
 
