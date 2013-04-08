@@ -30,7 +30,9 @@ public class GetUserServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		getUser(request, response);
+		try {
+			getUser(request, response);
+		} catch(JSONException ex) {}
 	}
 
 	/**
@@ -41,17 +43,19 @@ public class GetUserServlet extends HttpServlet {
 	}
 	
 	private void getUser(HttpServletRequest request, HttpServletResponse response) 
-			throws ServletException, IOException {
+			throws ServletException, IOException, JSONException {
 		
 		response.setContentType("application/json");
 		
-		HttpSession session = request.getSession();
-		User user = (User)session.getAttribute("user");
-		
-		PrintWriter out = response.getWriter();
 		JSONObject userJson = new JSONObject();
+		PrintWriter out = response.getWriter();
 		
-		try {
+		HttpSession session = request.getSession(false);
+
+		if(session != null) {
+		
+			User user = (User)session.getAttribute("user");
+			
 			if(user != null) {
 				userJson.put("email", user.getEmail());
 				userJson.put("displayName", user.getDisplayName());
@@ -61,17 +65,20 @@ public class GetUserServlet extends HttpServlet {
 				userJson.put("displayName", "");
 				userJson.put("login", false);
 			}
-			
-			String callback = request.getParameter("callback");
-			
-			if(callback != null) {
-				String content = callback + "(" + userJson.toString() + ")"; 
-				out.print(content);
-			} else {
-				out.print(userJson);
-			}
-			
-		} catch(JSONException ex) {}
+		} else {
+			userJson.put("email", "");
+			userJson.put("displayName", "");
+			userJson.put("login", false);
+		}
+		
+		String callback = request.getParameter("callback");
+		
+		if(callback != null) {
+			String content = callback + "(" + userJson.toString() + ")"; 
+			out.print(content);
+		} else {
+			out.print(userJson);
+		}
 	}
 
 }

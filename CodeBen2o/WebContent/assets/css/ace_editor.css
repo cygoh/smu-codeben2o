@@ -2,6 +2,12 @@
 
 #my_editor, #friend_editor {
   position: relative;
-  width: 420px;
+  width: 470px;
   height: 300px;
+  padding-right: 2px;
+}
+
+#friend_editor_header {
+	margin-top: -30px;
+	padding-left: 490px;
 }

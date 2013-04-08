@@ -28,10 +28,6 @@
 	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	  })();
 	</script>
-	
-	<script>
-		
-	</script>
 
     <link href="assets/css/ace_editor.css" rel="stylesheet">
     <link href="assets/css/bootstrap.css" rel="stylesheet">
@@ -45,7 +41,7 @@
       /* Custom container */
       .container-narrow {
         margin: 0 auto;
-        max-width: 1000px;
+        max-width: 1200px;
       }
       .container-narrow > hr {
         margin: 30px 0;
@@ -81,7 +77,7 @@
           <li class="active"><a href="main.html">Home</a></li>
           <li><a href="donate.html">Donate</a></li>
           <li><a href="contact.html">Contact</a></li>
-          <li ng-show="User.login"><a id="User.displayName" href="/logout">Logout</a></li>
+          <li ng-show="User.login"><a href="/logout">Logout</a></li>
         </ul>
         <h3 class="muted">CodeBen2o</h3>
       </div>
@@ -92,22 +88,26 @@
     		<div class="span2">
 	      		<!--Sidebar content-->
 	      		<p>Hi {{User.displayName}}</p>
-	      		<p>Who's online?</p>
+	      		<p><span class="label">Who's Online:</span></p>
 	      		<div id="presenceDiv"></div>
     		</div>
     		<div class="span10" ng-controller="verifierCtrl">
     			<!--Body content-->
-    			<p>Problem statement: Write a method that returns a value of "HI".</p>
+    			<div class="alert alert-info">Note: This site is still undergoing development. However you can try out the example below. We would appreciate if you could offer some feedback as well!</div>
+    			<div class="alert alert-success">
+    				<p>Category: {{language}}</p>
+    				{{question}}
+    			</div>
 	      		<p><a class="btn btn-small" ng-click="verify()">Verify your code</a></p>
-	      		<p>Status: {{status}}</p>
-		  		<p>Result: {{result}}</p>
+	      		<p>Status: <span class="label label-info">{{status}}</span></p>
+		  		<p>Result: <span id="result" class="label">{{result}}</span></p>
 		  		<h6>My code editor</h6>
-	      		<div id="my_editor">public String printName() {
+	      		<div id="my_editor" class="pull-left">public String printName() {
     return "HI";
 }
 String a = printName();</div>
-	      		<!-- <h6>Friend's editor</h6>
-	      		<div id="friend_editor">**insert**</div> -->
+	      		<h6 id="friend_editor_header">Friend's editor</h6>
+	      		<div id="friend_editor" class="pull-right"></div>
 	    	</div>
   		</div>
 	  </div>

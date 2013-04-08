@@ -14,13 +14,24 @@ function mainCtrl($scope, $resource) {
 			setOnlineUser(response.displayName);
 		});
 	};
-	
+
 	$scope.getUser();
 }
 
 function verifierCtrl($scope, $resource) {
-	$scope.solution = "";
-	$scope.tests = "assertEquals(\"HI\",a);";
+	
+	var questions = [{"language": "java", "problem":"Complete the method below to return a value of \"I Love Java\".", "solution": "public String print() {\n /*Insert your codes here*/\n}\nString a = print();", "test": "assertEquals(\"I Love Java\", a);"}, 
+	                 {"language": "javascript", "problem": "Complete the function below to convert the input value to double.", "solution": "function toDouble(value) {\n /*Insert your codes here*/\n}\nvar a = toDouble(\"10\");", "test": "assert_equal(10.0, a);"},
+	                 {"language": "java", "problem":"Complete the method below to return the input parameter in reverse order.", "solution": "public String reverse(value) {\n /*Insert your codes here*/\n}\nString a = reverse(\"javaisawesome\");", "test": "assertEquals(\"emosewasiavaj\", a);"}];
+	
+	var randNum = Math.floor(Math.random()*questions.length);
+	
+	$scope.question = questions[randNum].problem;
+	$scope.language = questions[randNum].language;
+	$scope.tests = questions[randNum].test;
+	
+	myEditor.getSession().setValue(questions[randNum].solution);
+	myEditor.getSession().setMode("ace/mode/" + questions[randNum].language);
 	
     $scope.VerifierModel = $resource('http://ec2-54-251-193-188.ap-southeast-1.compute.amazonaws.com/:language',
     		{},{'get': {method: 'JSONP', isArray: false, params:{vcallback: 'JSON_CALLBACK'}}
@@ -36,19 +47,22 @@ function verifierCtrl($scope, $resource) {
 		jsonrequest = btoa(JSON.stringify(data));
 		$scope.status = "Verifying your code";
 		
-		$scope.language = "java";
+		if($scope.language === "javascript") {
+			$scope.language = "js";
+		}
 		
-		$scope.VerifierModel.get({'language':$scope.language,
-			'jsonrequest':jsonrequest},
-			function(response) {
-				if(response.solved) {
-					$scope.result = "Passed";
-				} else {
-					$scope.result = "Failed";
-				}
+		$scope.VerifierModel.get({'language':$scope.language, 'jsonrequest':jsonrequest}, 
+				function(response) {
+					if(response.solved) {
+						$scope.result = "Test Passed";
+						$('#result').addClass("label-success");
+					} else {
+						$scope.result = "Test Failed";
+						$('#result').addClass("label-important");
+					}
 				
-				$scope.status = "Verification completed";
-			});  
+					$scope.status = "Verification completed";
+		});
 	};
 }
 
@@ -64,13 +78,13 @@ function setOnlineUser(name) {
 	currentStatus = "online";
 
 	// Get a reference to the presence data in Firebase.
-	var userListRef = new Firebase("https://codeben2o-presence.firebaseio-demo.com/");
+	var userListRef = new Firebase("https://codeben2o-presence.firebaseio.com/");
 
 	// Generate a reference to a new location for my user with push.
 	var myUserRef = userListRef.push();
 
 	// Get a reference to my own presence status.
-	var connectedRef = new Firebase("http://codeben2o-presence.firebaseio-demo.com/.info/connected");
+	var connectedRef = new Firebase("http://codeben2o-presence.firebaseio.com/.info/connected");
 	connectedRef.on("value", function(isOnline) {
 		if (isOnline.val()) {
 			// If we lose our internet connection, we want ourselves removed from the list.
@@ -91,7 +105,7 @@ function setOnlineUser(name) {
 	userListRef.on("child_added", function(snapshot) {
 		var user = snapshot.val();
 		$("#presenceDiv").append($("<div/>").attr("id", snapshot.name()));
-		$("#" + snapshot.name()).text(user.name + " is currently " + user.status);
+		$("#" + snapshot.name()).text(user.name + " is " + user.status);
 	});
 
 	// Update our GUI to remove the status of a user who has left.
@@ -102,7 +116,7 @@ function setOnlineUser(name) {
 	// Update our GUI to change a user"s status.
 	userListRef.on("child_changed", function(snapshot) {
 		var user = snapshot.val();
-		$("#" + snapshot.name()).text(user.name + " is currently " + user.status);
+		$("#" + snapshot.name()).text(user.name + " is " + user.status);
 	});
 
 	// Use idle/away/back events created by idle.js to update our status information.
