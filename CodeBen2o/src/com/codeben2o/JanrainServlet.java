@@ -1,12 +1,14 @@
-package com.janrain;
+package com.codeben2o;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.googlecode.janrain4j.api.engage.EngageFailureException;
 import com.googlecode.janrain4j.api.engage.EngageService;
@@ -46,19 +48,18 @@ public class JanrainServlet extends HttpServlet {
         
         // Get the EngageService
         EngageService engageService = EngageServiceFactory.getEngageService();
-        PrintWriter out = response.getWriter();
 
         try {
             // Retrieve the Janrain user data
             UserDataResponse userDataResponse = engageService.authInfo(token);
             Profile profile = userDataResponse.getProfile();
-            String identifier = profile.getIdentifier();
-            String result = userDataResponse.getResponseAsJSON();
             
-            // TODO Retrieve more user data like name, email, friends, ...
+            User user = new User(profile.getEmail(), profile.getDisplayName());
+            
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
 
-            // TODO Do something with the retrieved user data 
-            response.sendRedirect("/construction.jsp");
+            response.sendRedirect("/main.html");
         }
         catch (EngageFailureException e) {
             // TODO
@@ -69,6 +70,9 @@ public class JanrainServlet extends HttpServlet {
         catch (Exception e) {
         	
         }
+        
+        //RequestDispatcher dispatcher = request.getRequestDispatcher("/construction.jsp");
+        //dispatcher.forward(request, response);
         
 	}
 

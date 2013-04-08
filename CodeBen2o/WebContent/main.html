@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myApp">
+  <head>
+    <meta charset="utf-8">
+    <title>CodeBen2o</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <!-- AngularJS Library -->
+    <script src="assets/js/angular/angular.js"></script>
+    <script src="assets/js/angular/angular-resource.js"></script>
+    
+    <script src="assets/js/jquery.js"></script>
+    <script src="assets/js/controller.js"></script>
+    <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+    <script src="https://www.firebase.com/js/libs/idle.js"></script>
+
+    <!-- Google Analytics Tracking Code -->
+    <script type="text/javascript">
+	  var _gaq = _gaq || [];
+	  _gaq.push(['_setAccount', 'UA-39828646-1']);
+	  _gaq.push(['_trackPageview']);
+	
+	  (function() {
+	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	  })();
+	</script>
+	
+	<script>
+		
+	</script>
+
+    <link href="assets/css/ace_editor.css" rel="stylesheet">
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 20px;
+        padding-bottom: 40px;
+      }
+
+      /* Custom container */
+      .container-narrow {
+        margin: 0 auto;
+        max-width: 1000px;
+      }
+      .container-narrow > hr {
+        margin: 30px 0;
+      }
+
+      /* Main marketing message and sign up button */
+      .jumbotron {
+        margin: 60px 0;
+        text-align: center;
+      }
+      .jumbotron h1 {
+        font-size: 72px;
+        line-height: 1;
+      }
+      .jumbotron .btn {
+        font-size: 21px;
+        padding: 14px 24px;
+      }
+
+      /* Supporting marketing content */
+      .marketing {
+        margin: 60px 0;
+      }
+      .marketing p + h4 {
+        margin-top: 28px;
+      }
+    </style>
+  </head>
+  <body ng-controller="mainCtrl">
+    <div class="container-narrow">
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li class="active"><a href="main.html">Home</a></li>
+          <li><a href="donate.html">Donate</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li ng-show="User.login"><a id="User.displayName" href="/logout">Logout</a></li>
+        </ul>
+        <h3 class="muted">CodeBen2o</h3>
+      </div>
+      <hr>
+      
+      <div class="container-fluid">
+  		<div class="row-fluid">
+    		<div class="span2">
+	      		<!--Sidebar content-->
+	      		<p>Hi {{User.displayName}}</p>
+	      		<p>Who's online?</p>
+	      		<div id="presenceDiv"></div>
+    		</div>
+    		<div class="span10" ng-controller="verifierCtrl">
+    			<!--Body content-->
+    			<p>Problem statement: Write a method that returns a value of "HI".</p>
+	      		<p><a class="btn btn-small" ng-click="verify()">Verify your code</a></p>
+	      		<p>Status: {{status}}</p>
+		  		<p>Result: {{result}}</p>
+		  		<h6>My code editor</h6>
+	      		<div id="my_editor">public String printName() {
+    return "HI";
+}
+String a = printName();</div>
+	      		<!-- <h6>Friend's editor</h6>
+	      		<div id="friend_editor">**insert**</div> -->
+	    	</div>
+  		</div>
+	  </div>
+      
+      <hr>
+      <div class="footer">
+        <p>&copy; Team CodeBen2o - SMU IS429 Class</p>
+      </div>
+      
+    </div> <!-- /container -->
+  </body>
+  
+  <!-- Ace Editor -->
+  <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  <script src="assets/js/editor.js"></script>
+    
+</html>
