@@ -68,13 +68,14 @@
     </style>
   </head>
   <body ng-controller="mainCtrl">
+  	<div id="fb-root"></div>
     <div class="container-narrow">
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
           <li ng-hide="User.login"><a href="index.html">Home</a></li>
           <li ng-show="User.login"><a href="main.html">Home</a></li>
           <li class="active"><a href="donate.html">Donate</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="contact.html">Feedback</a></li>
           <li ng-show="User.login"><a href="/logout">Logout</a></li>
         </ul>
         <h3 class="muted">CodeBen2o</h3>
@@ -87,8 +88,19 @@
       </div>
       <hr>
       <div class="footer">
-        <p>&copy; Team CodeBen2o - SMU IS429 Class</p>
+      	<div style="margin-top:-1px;margin-right:-65px"class="fb-like pull-right" data-href="http://codeben2o.elasticbeanstalk.com/" data-send="false" data-width="450" data-show-faces="true" data-font="arial" data-action="recommend"></div>
+        <p>&copy; Team CodeBen2o</p>
       </div>
     </div> <!-- /container -->
   </body>
+  
+  <script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=138311809684130";
+	  fjs.parentNode.insertBefore(js, fjs);
+	  }(document, 'script', 'facebook-jssdk'));
+  </script>
+  
 </html>

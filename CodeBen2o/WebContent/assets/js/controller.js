@@ -1,5 +1,7 @@
 angular.module('myApp', ['ngResource']);
 
+var userName = "";
+
 function mainCtrl($scope, $resource) {
 	
 	$scope.remote_url = "codeben2o.elasticbeanstalk.com";
@@ -11,58 +13,151 @@ function mainCtrl($scope, $resource) {
 		data = {"remote_url":$scope.remote_url};
 		$scope.User.get(data, function(response) {
 			$scope.User = response;
-			setOnlineUser(response.displayName);
+			userName = response.displayName;
+			setOnlineUser(userName);
 		});
 	};
 
 	$scope.getUser();
+	
+	/*if(!$scope.User.login) {
+		window.location = "index.html";
+	}*/
 }
 
 function verifierCtrl($scope, $resource) {
 	
-	var questions = [{"language": "java", "problem":"Complete the method below to return a value of \"I Love Java\".", "solution": "public String print() {\n /*Insert your codes here*/\n}\nString a = print();", "test": "assertEquals(\"I Love Java\", a);"}, 
+	var myEditor = null;
+	var friendEditor = null;
+	
+	// Initialize questions set
+	var questions = [{"language": "java", "problem":"Complete the method below to return a value of \"I Love Java\". Do note output are case-sensitive!", "solution": "public String print() {\n /*Insert your codes here*/\n}\nString a = print();", "test": "assertEquals(\"I Love Java\", a);"}, 
 	                 {"language": "javascript", "problem": "Complete the function below to convert the input value to double.", "solution": "function toDouble(value) {\n /*Insert your codes here*/\n}\nvar a = toDouble(\"10\");", "test": "assert_equal(10.0, a);"},
 	                 {"language": "java", "problem":"Complete the method below to return the input parameter in reverse order.", "solution": "public String reverse(value) {\n /*Insert your codes here*/\n}\nString a = reverse(\"javaisawesome\");", "test": "assertEquals(\"emosewasiavaj\", a);"}];
 	
-	var randNum = Math.floor(Math.random()*questions.length);
+	var sessionListRef = new Firebase("https://codeben2o-collaborate.firebaseio.com/");
 	
-	$scope.question = questions[randNum].problem;
-	$scope.language = questions[randNum].language;
-	$scope.tests = questions[randNum].test;
+	// Generate a new session and join as player 0
+	$scope.getSession = function() {
+		var sessionRef = sessionListRef.push();
+		
+		$scope.session = sessionRef.name();
+		
+		// Get a random question from the question set
+		var randNum = Math.floor(Math.random()*questions.length);
+		$scope.question = questions[randNum].problem;
+		$scope.language = questions[randNum].language;
+		$scope.tests = questions[randNum].test;
+		
+		// Render Ace Editor
+		myEditor = ace.edit("my_editor");
+		myEditor.setTheme("ace/theme/twilight");
+		myEditor.setReadOnly(false);
+
+		friendEditor = ace.edit("friend_editor");
+		friendEditor.setTheme("ace/theme/twilight");
+		friendEditor.setReadOnly(true);
+		
+		// Set Ace editor with the appropriate language syntax and code snippet
+		myEditor.getSession().setValue(questions[randNum].solution);
+		myEditor.getSession().setMode("ace/mode/" + $scope.language);
+		friendEditor.getSession().setMode("ace/mode/" + $scope.language);
+		
+		sessionRef.set({ question: $scope.question, language: $scope.language });
+		
+		var player0Ref = new Firebase(sessionRef.toString() + "/player0");
+		player0Ref.set({ user: userName, solution: myEditor.getSession().getValue()});
+		
+		myEditor.getSession().on("change", function(e) {
+			player0Ref.update({solution: myEditor.getSession().getValue()});
+		});
+		
+		var player1Ref = new Firebase(sessionRef.toString() + "/player1");
+		player1Ref.set({ user: "", solution: "" });
+		player1Ref.on("child_changed", function(snapshot) {
+			if(snapshot.name() === 'solution') {
+				friendEditor.getSession().setValue(snapshot.val());
+			}
+		});
+	};
 	
-	myEditor.getSession().setValue(questions[randNum].solution);
-	myEditor.getSession().setMode("ace/mode/" + questions[randNum].language);
-	
+	// Someone join the session as player 1
+	$scope.joinSession = function() {
+		var sessionID = prompt("Enter the session id:");
+		$scope.session = sessionID;
+		
+		var sessionRef = new Firebase(sessionListRef.toString() + "/" + sessionID);
+		
+		sessionRef.child('language').once('value', function(dataSnapShot) {
+		});
+		
+		sessionRef.child('question').once('value', function(dataSnapShot) {
+		});
+		
+		// Render Ace Editor
+		myEditor = ace.edit("my_editor");
+		myEditor.setTheme("ace/theme/twilight");
+		myEditor.setReadOnly(true);
+
+		friendEditor = ace.edit("friend_editor");
+		friendEditor.setTheme("ace/theme/twilight");
+		friendEditor.setReadOnly(false);
+		
+		// Set Ace editor with the appropriate language syntax and code snippet
+		myEditor.getSession().setMode("ace/mode/" + "java");
+		friendEditor.getSession().setMode("ace/mode/" + "java");
+		
+		var player1Ref = new Firebase(sessionRef.toString() + "/player1");
+		player1Ref.update({ user: userName, solution: myEditor.getSession().getValue()});
+		
+		var player0Ref = new Firebase(sessionRef.toString() + "/player0");
+		player0Ref.on("child_changed", function(snapshot) {
+			if(snapshot.name() === 'solution') {
+				myEditor.getSession().setValue(snapshot.val());
+			}
+		});
+		
+		friendEditor.getSession().on("change", function(e) {
+			player1Ref.update({solution: friendEditor.getSession().getValue()});
+		});
+	};
+
+	// Verifier-As-a-Service hosted on EC2
     $scope.VerifierModel = $resource('http://ec2-54-251-193-188.ap-southeast-1.compute.amazonaws.com/:language',
     		{},{'get': {method: 'JSONP', isArray: false, params:{vcallback: 'JSON_CALLBACK'}}
     		});
 	
+    // Function to handle on click event of "Verify your Code" button
 	$scope.verify = function() {
-		$scope.solution = myEditor.getSession().getValue();
-		
-		data = {"solution": "", "tests": ""};
-		data.solution = $scope.solution;
-		data.tests = $scope.tests;
-		
-		jsonrequest = btoa(JSON.stringify(data));
-		$scope.status = "Verifying your code";
-		
-		if($scope.language === "javascript") {
-			$scope.language = "js";
+		if($scope.session != undefined) {
+			$scope.solution = myEditor.getSession().getValue();
+			
+			data = {"solution": "", "tests": ""};
+			data.solution = $scope.solution;
+			data.tests = $scope.tests;
+			
+			jsonrequest = btoa(JSON.stringify(data));
+			$scope.status = "Verifying your code";
+			
+			if($scope.language === "javascript") {
+				$scope.language = "js";
+			}
+			
+			$scope.VerifierModel.get({'language':$scope.language, 'jsonrequest':jsonrequest}, 
+					function(response) {
+						if(response.solved) {
+							$scope.result = "Test Passed";
+							$('#result').addClass("label-success");
+						} else {
+							$scope.result = "Test Failed";
+							$('#result').addClass("label-important");
+						}
+					
+						$scope.status = "Verification completed";
+			});
+		} else {
+			alert("Oops, there is nothing to verify. Please ensure you have generate or join a session!");
 		}
-		
-		$scope.VerifierModel.get({'language':$scope.language, 'jsonrequest':jsonrequest}, 
-				function(response) {
-					if(response.solved) {
-						$scope.result = "Test Passed";
-						$('#result').addClass("label-success");
-					} else {
-						$scope.result = "Test Failed";
-						$('#result').addClass("label-important");
-					}
-				
-					$scope.status = "Verification completed";
-		});
 	};
 }
 
@@ -74,21 +169,20 @@ function setUserStatus(status, myUserRef, name) {
 }
 
 function setOnlineUser(name) {
-	//Prompt the user for a name to use.
 	currentStatus = "online";
-
-	// Get a reference to the presence data in Firebase.
-	var userListRef = new Firebase("https://codeben2o-presence.firebaseio.com/");
-
-	// Generate a reference to a new location for my user with push.
-	var myUserRef = userListRef.push();
+	var childName = name.replace(/ /g,'');
+	
+	// Get a reference to the user presence data in Firebase.
+	var userListRef = new Firebase("https://codeben2o-presence.firebaseio.com/users");
+	
+	var myUserRef = new Firebase("https://codeben2o-presence.firebaseio.com/users/" + childName);
 
 	// Get a reference to my own presence status.
 	var connectedRef = new Firebase("http://codeben2o-presence.firebaseio.com/.info/connected");
 	connectedRef.on("value", function(isOnline) {
 		if (isOnline.val()) {
 			// If we lose our internet connection, we want ourselves removed from the list.
-			myUserRef.onDisconnect().remove();
+			userListRef.onDisconnect().remove();
 
 			// Set our initial online status.
 			setUserStatus("online", myUserRef, name);
@@ -104,7 +198,7 @@ function setOnlineUser(name) {
 	// Update our GUI to show someone"s online status.
 	userListRef.on("child_added", function(snapshot) {
 		var user = snapshot.val();
-		$("#presenceDiv").append($("<div/>").attr("id", snapshot.name()));
+		$('#presenceDiv').append($('<div/>').attr('id', snapshot.name()));
 		$("#" + snapshot.name()).text(user.name + " is " + user.status);
 	});
 
@@ -133,4 +227,3 @@ function setOnlineUser(name) {
 	setIdleTimeout(20000);
 	setAwayTimeout(50000);
 }
-

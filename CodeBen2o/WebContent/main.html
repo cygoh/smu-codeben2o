@@ -12,7 +12,6 @@
     <script src="assets/js/angular/angular-resource.js"></script>
     
     <script src="assets/js/jquery.js"></script>
-    <script src="assets/js/controller.js"></script>
     <script src="https://cdn.firebase.com/v0/firebase.js"></script>
     <script src="https://www.firebase.com/js/libs/idle.js"></script>
 
@@ -71,42 +70,60 @@
     </style>
   </head>
   <body ng-controller="mainCtrl">
+  	<div id="fb-root"></div>
     <div class="container-narrow">
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
           <li class="active"><a href="main.html">Home</a></li>
           <li><a href="donate.html">Donate</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="contact.html">Feedback</a></li>
           <li ng-show="User.login"><a href="/logout">Logout</a></li>
         </ul>
         <h3 class="muted">CodeBen2o</h3>
       </div>
       <hr>
       
-      <div class="container-fluid">
+      <div class="container-fluid" ng-controller="verifierCtrl">
   		<div class="row-fluid">
     		<div class="span2">
 	      		<!--Sidebar content-->
 	      		<p>Hi {{User.displayName}}</p>
 	      		<p><span class="label">Who's Online:</span></p>
-	      		<div id="presenceDiv"></div>
+	      		<div id="presenceDiv" style="height: 180px; overflow: auto"></div>
+	      		<p><span class="label">Chat with us:</span></p>
+	      		<noscript>Enable Javascript to get full functionality of this <a href="http://www.freeshoutbox.net/">shoutbox</a><br /></noscript><iframe src="http://codeben2o.freeshoutbox.net/" height="480" width="180" frameborder="0"></iframe>
     		</div>
-    		<div class="span10" ng-controller="verifierCtrl">
+    		<div class="span10">
     			<!--Body content-->
-    			<div class="alert alert-info">Note: This site is still undergoing development. However you can try out the example below. We would appreciate if you could offer some feedback as well!</div>
+    			<div class="alert alert-info">Note: This site is still undergoing development. Collaboration features are not functioning properly. However you can try out the example below. We would appreciate if you could offer some <a href="contact.html">feedback</a> as well!</div>
     			<div class="alert alert-success">
-    				<p>Category: {{language}}</p>
-    				{{question}}
+    				<table>
+    					<tr>
+    						<td style="width:330px">
+    						<p>Current Session id: {{session}}</p>
+							<p>You may:</p>
+							<p><a class="btn btn-small" ng-click="joinSession()">Join a session</a></p>
+							<p><a class="btn btn-small" ng-click="getSession()">Generate a session</a></p>
+    						</td>
+    						<td>
+    							<p><u>How it works:</u></p>
+    							<p><b>Join a session</b> allows you to join your friend's session. Get the session id from him/her now and start to have fun coding together.</p>
+    							<p><b>Generate a session</b> creates a new coding session for you. You can pass the session id to your friend in order for him/her to collaborate with you.</p>
+    						</td>
+    					</tr>
+    				</table>
+    				<hr>
+    				<div>
+	    				<h5>Challenge: {{question}}</h5>
+	    				<p>Category: {{language}}</p>
+		      			<p>Status: <span class="label label-info">{{status}}</span></p>
+			  			<p>Result: <span id="result" class="label">{{result}}</span></p>
+			  			<p><a class="btn btn-small" ng-click="verify()">Verify your code</a></p>
+		  			</div>
     			</div>
-	      		<p><a class="btn btn-small" ng-click="verify()">Verify your code</a></p>
-	      		<p>Status: <span class="label label-info">{{status}}</span></p>
-		  		<p>Result: <span id="result" class="label">{{result}}</span></p>
-		  		<h6>My code editor</h6>
-	      		<div id="my_editor" class="pull-left">public String printName() {
-    return "HI";
-}
-String a = printName();</div>
-	      		<h6 id="friend_editor_header">Friend's editor</h6>
+		  		<h6 id="my_editor_header"></h6>
+	      		<div id="my_editor" class="pull-left"></div>
+	      		<h6 id="friend_editor_header"></h6>
 	      		<div id="friend_editor" class="pull-right"></div>
 	    	</div>
   		</div>
@@ -114,7 +131,8 @@ String a = printName();</div>
       
       <hr>
       <div class="footer">
-        <p>&copy; Team CodeBen2o - SMU IS429 Class</p>
+      	<div style="margin-top:-1px;margin-right:-65px"class="fb-like pull-right" data-href="http://codeben2o.elasticbeanstalk.com/" data-send="false" data-width="450" data-show-faces="true" data-font="arial" data-action="recommend"></div>
+        <p>&copy; Team CodeBen2o</p>
       </div>
       
     </div> <!-- /container -->
@@ -122,6 +140,14 @@ String a = printName();</div>
   
   <!-- Ace Editor -->
   <script src="http://d1n0x3qji82z53.cloudfront.net/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-  <script src="assets/js/editor.js"></script>
-    
+  <script src="assets/js/controller.js"></script>
+   
+  <script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1&appId=138311809684130";
+	  fjs.parentNode.insertBefore(js, fjs);
+	  }(document, 'script', 'facebook-jssdk'));
+  </script>
 </html>
