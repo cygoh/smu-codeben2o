@@ -1,0 +1,74 @@
+@CHARSET "ISO-8859-1";
+
+  /* GLOBAL STYLES
+    -------------------------------------------------- */
+    /* Padding below the footer and lighter body text */
+
+    body {
+      width: 100%;
+      height: 100%;
+      overflow-x: auto;
+      overflow-y: scroll;
+      background-color: rgba(243, 242, 197, 0.9);
+    }
+    
+    #note {
+      background-color: rgba(165, 216, 56, 0.9);
+    }
+    
+    #googleform {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border: 2px outset rgba(255, 103, 0, 0.40);
+      border-radius: 6px;
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+    }
+
+    #shoutbox {
+      width: 180px;
+      height: 480px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      border: none;
+    }
+	
+	a {
+	  color: rgba(255, 103, 0, 1);
+	}
+	
+	a:hover, a:focus {
+	  color: rgba(255, 103, 0, 0.75);
+	}
+	
+    div.masthead h3 > a {
+      color: rgba(58, 43, 43, 1);
+    }
+    
+    div.masthead h3 > a:hover,
+    div.masthead h3 > a:focus {
+      color: rgba(58, 43, 43, 0.75);
+    }
+	
+	.nav-pills > .active > a {
+	  background-color: #47cd1b;
+	}
+	
+	.nav-pills > .active > a:hover,
+	.nav-pills > .active > a:focus {
+	  background-color: rgba(77, 243, 23, 0.9);
+	}
+	
+	.nav-pills > li > a:hover,
+	.nav-pills > li > a:focus {
+	  background-color: rgba(255, 103, 0, 0.75);
+	}	
+	
+  
+    div.well {
+      background-color: rgba(118, 214, 118, 0.4);
+      border-radius: 6px;
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+    }
