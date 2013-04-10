@@ -102,11 +102,11 @@
 	    		<div class="well well-small">
 	    			<!--Body content-->
 	    			<div id="note" class="alert alert-success">
-	    				<p>Note: This site is still undergoing development. Collaboration features are not functioning properly. However you can try out the example below. We would appreciate if you could offer some <a href="contact.html">feedback</a> as well!</p>
+	    				<p>Note: We support only Java and Javascript pair programming. There are only 1 problem set available as of now. We are in the process of adding more problem sets.  <a href="contact.html">Feedback</a> is greatly appreciated!</p>
 	    				<hr>
 	    				<table>
 	    					<tr>
-	    						<td style="width:330px">
+	    						<td style="width:40%">
 	    						<p>Current Session id: <b>{{session}}</b></p>
 								<p>You may:</p>
 								<p><a class="btn btn-warning btn-small" ng-click="joinSession()">Join a session</a></p>
@@ -115,19 +115,23 @@
 	    						<td>
 	    							<p><b>How it works:</b></p>
 	    							<p><b>Join a session</b> allows you to join your friend's session. Get the session id from him/her now and start to have fun coding together.</p>
-	    							<p><b>Generate a session</b> creates a new coding session for you. You can pass the session id to your friend in order for him/her to collaborate with you.</p>
+	    							<p><b>Generate a session</b> creates a new coding session for you. Pass the session id to your friend for him/her to collaborate with you.</p>
 	    						</td>
 	    					</tr>
 	    				</table>
-	    				<hr>
-	    				<div>
-		    				<p><span><b>Challenge: {{question}}</b></span></p>
-		    				<p>Category: {{language}}</p>
-			      			<p>Status: <span class="badge badge-warning">{{status}}</span></p>
-				  			<p>Result: <span id="result" class="badge badge-warning">{{result}}</span></p>
-				  			<p><a class="btn btn-warning btn-small" ng-click="verify()">Verify your code</a></p>
-			  			</div>
 	    			</div>
+	    			<hr>
+    				<div id="note" class="alert alert-success">
+	    				<p><span><b>Challenge: {{question}}</b></span></p>
+	    				<p>Your task: {{playerTask}}</p>
+	    				<p>Category: {{language}}</p>
+		      			<p>Status: <span class="badge badge-warning">{{status}}</span></p>
+			  			<p>Individual Result: <span id="result" class="badge badge-warning">{{result}}</span></p>
+			  			<p>Compiled Result: <span id="compiledResult" class="badge badge-warning">{{compiledResult}}</span></p>
+			  			<p><a class="btn btn-warning btn-small" ng-click="verify()">Verify your code</a></p>
+			  			<p><a class="btn btn-warning btn-small" ng-click="verifyCompile()">Verify compiled code</a></p>
+			  			
+		  			</div>
 	    		</div>
 		  		<h6 id="my_editor_header"></h6>
 	      		<div id="my_editor" class="pull-left"></div>
@@ -143,10 +147,11 @@
       		<p>
       			<b>
       				Affiliates: | 
-      				<a href="http://ec2-54-251-120-78.ap-southeast-1.compute.amazonaws.com">MReduce</a> | 
+      				<a href="http://ec2-54-251-120-78.ap-southeast-1.compute.amazonaws.com">MapReduce</a> | 
       				<a href="http://codefu-5euzxjdg6b.elasticbeanstalk.com/codeKungfu.jsp">Code Kungfu</a> | 
       				<a href="http://scratchpad-dscqvjpx3v.elasticbeanstalk.com ">scratchpad</a> | 
-      				<a href="http://afacebook.appspot.com">afacebook</a> 
+      				<a href="http://afacebook.appspot.com">afacebook</a> |
+      				<a href="https://apps.facebook.com/beattherpsbots/">Beat the Bots</a> 
       			</b>
       		</p>
       	</div>

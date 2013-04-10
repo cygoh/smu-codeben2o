@@ -1,6 +1,7 @@
 angular.module('myApp', ['ngResource']);
 
 var userName = "";
+var cssClass = "";
 
 function mainCtrl($scope, $resource) {
 	
@@ -13,16 +14,16 @@ function mainCtrl($scope, $resource) {
 		data = {"remote_url":$scope.remote_url};
 		$scope.User.get(data, function(response) {
 			$scope.User = response;
-			userName = response.displayName;
-			setOnlineUser(userName);
+			userName = $scope.User.displayName;
+			if($scope.User.login) {
+				setOnlineUser(userName);
+			} else {
+				window.location = "index.html";
+			}
 		});
 	};
 
 	$scope.getUser();
-	
-	/*if(!$scope.User.login) {
-		window.location = "index.html";
-	}*/
 }
 
 function verifierCtrl($scope, $resource) {
@@ -32,50 +33,56 @@ function verifierCtrl($scope, $resource) {
 	var friendEditor = null;
 	
 	// Initialize questions set
-	var questions = [{"language": "java", "problem":"Complete the method below to return a value of \"I Love Java\". Do note output are case-sensitive!", "solution": "public String print() {\n /*Insert your codes here*/\n}\nString a = print();", "test": "assertEquals(\"I Love Java\", a);"}, 
-	                 {"language": "javascript", "problem": "Complete the function below to convert the input value to double.", "solution": "function toDouble(value) {\n /*Insert your codes here*/\n}\nvar a = toDouble(\"10\");", "test": "assert_equal(10.0, a);"},
-	                 {"language": "java", "problem":"Complete the method below to return the input parameter in reverse order.", "solution": "public String reverse(value) {\n /*Insert your codes here*/\n}\nString a = reverse(\"javaisawesome\");", "test": "assertEquals(\"emosewasiavaj\", a);"}];
+	var questions = [{"language": "java", "challenge":"Write two method Hello and World respectively to print out Hello World", "player0Task": "Write a method called Hello() that return a string \"Hello\"", 
+		"player1Task": "Write a method called World that return a string \"World\"", "player0Test": "assertEquals(Hello(), \"Hello\")", "player1Test": "assertEquals(World(), \"World\")", 
+		"test": "assertEquals(Hello() + \" \" + World(), \"Hello World\");"}];
 	
 	var sessionListRef = new Firebase("https://codeben2o-collaborate.firebaseio.com/");
 	
 	// Generate a new session and join as player 0
 	$scope.getSession = function() {
+		// Re-initialize variable and remove css classes
+		$scope.result = "";
+		$scope.status = "";
+		$('#result').removeClass(cssClass);
+		$('#compiledResult').removeClass(cssClass);
+		
 		var sessionRef = sessionListRef.push();
 		
 		$scope.session = sessionRef.name();
 		
 		// Get a random question from the question set
 		var randNum = Math.floor(Math.random()*questions.length);
-		$scope.question = questions[randNum].problem;
+		$scope.question = questions[randNum].challenge;
+		$scope.playerTask = questions[randNum].player0Task;
 		$scope.language = questions[randNum].language;
-		$scope.tests = questions[randNum].test;
+		$scope.playerTest = questions[randNum].player0Test;
 		
 		// Render Ace Editor
 		myEditor = ace.edit("my_editor");
-		myEditor.setTheme("ace/theme/twilight");
+		myEditor.setTheme("ace/theme/merbivore");
 		myEditor.setReadOnly(false);
 		editor = myEditor;
 
 		friendEditor = ace.edit("friend_editor");
-		friendEditor.setTheme("ace/theme/twilight");
+		friendEditor.setTheme("ace/theme/merbivore");
 		friendEditor.setReadOnly(true);
 		
 		// Set Ace editor with the appropriate language syntax and code snippet
-		myEditor.getSession().setValue(questions[randNum].solution);
 		myEditor.getSession().setMode("ace/mode/" + $scope.language);
 		friendEditor.getSession().setMode("ace/mode/" + $scope.language);
 		
-		sessionRef.set({ question: $scope.question, language: $scope.language });
+		sessionRef.set({ question: $scope.question, language: $scope.language, test: questions[randNum].test });
 		
 		var player0Ref = new Firebase(sessionRef.toString() + "/player0");
-		player0Ref.set({ user: userName, solution: myEditor.getSession().getValue()});
+		player0Ref.set({ user: userName, task: $scope.playerTask, solution: "" });
 		
 		myEditor.getSession().on("change", function(e) {
 			player0Ref.update({solution: myEditor.getSession().getValue()});
 		});
 		
 		var player1Ref = new Firebase(sessionRef.toString() + "/player1");
-		player1Ref.set({ user: "", solution: "" });
+		player1Ref.set({ user: "", task: questions[randNum].player1Task, test: questions[randNum].player1Test, solution: "" });
 		player1Ref.on("child_changed", function(snapshot) {
 			if(snapshot.name() === 'solution') {
 				friendEditor.getSession().setValue(snapshot.val());
@@ -86,48 +93,67 @@ function verifierCtrl($scope, $resource) {
 	// Someone join the session as player 1
 	$scope.joinSession = function() {
 		var sessionID = prompt("Paste your friend session id here:");
-		$scope.session = sessionID;
 		
-		var sessionRef = new Firebase(sessionListRef.toString() + "/" + sessionID);
-		
-		sessionRef.child('language').once('value', function(dataSnapShot) {
-			$scope.$apply(function() {
-				$scope.language = dataSnapShot.val();
-				// Set Ace editor with the appropriate language syntax and code snippet
-				myEditor.getSession().setMode("ace/mode/" + $scope.language);
-				friendEditor.getSession().setMode("ace/mode/" + $scope.language);
-			});
-			
-		});
-		
-		sessionRef.child('question').once('value', function(dataSnapShot) {
-			$scope.$apply(function() {
-				$scope.question = dataSnapShot.val();
-			});
-		});
-		
-		// Render Ace Editor
-		myEditor = ace.edit("my_editor");
-		myEditor.setTheme("ace/theme/twilight");
-		myEditor.setReadOnly(true);
+		sessionListRef.child(sessionID).once('value', function(data) {
+			if(data.val() != null) {
+				$scope.session = sessionID;
+				
+				var sessionRef = new Firebase(sessionListRef.toString() + "/" + sessionID);
+				
+				sessionRef.child('language').once('value', function(dataSnapShot) {
+					$scope.$apply(function() {
+						$scope.language = dataSnapShot.val();
+						// Set Ace editor with the appropriate language syntax and code snippet
+						myEditor.getSession().setMode("ace/mode/" + $scope.language);
+						friendEditor.getSession().setMode("ace/mode/" + $scope.language);
+					});
+					
+				});
+				
+				sessionRef.child('question').once('value', function(dataSnapShot) {
+					$scope.$apply(function() {
+						$scope.question = dataSnapShot.val();
+					});
+				});
+				
+				sessionRef.child('player1').child('task').once('value', function(dataSnapShot) {
+					$scope.$apply(function() {
+						$scope.playerTask = dataSnapShot.val();
+					});
+				});
+				
+				sessionRef.child('player1').child('test').once('value', function(dataSnapShot) {
+					$scope.$apply(function() {
+						$scope.playerTest = dataSnapShot.val();
+					});
+				});
+				
+				// Render Ace Editor
+				myEditor = ace.edit("my_editor");
+				myEditor.setTheme("ace/theme/merbivore");
+				myEditor.setReadOnly(true);
 
-		friendEditor = ace.edit("friend_editor");
-		friendEditor.setTheme("ace/theme/twilight");
-		friendEditor.setReadOnly(false);
-		editor = friendEditor;
+				friendEditor = ace.edit("friend_editor");
+				friendEditor.setTheme("ace/theme/merbivore");
+				friendEditor.setReadOnly(false);
+				editor = friendEditor;
 
-		var player1Ref = new Firebase(sessionRef.toString() + "/player1");
-		player1Ref.update({ user: userName, solution: myEditor.getSession().getValue()});
-		
-		var player0Ref = new Firebase(sessionRef.toString() + "/player0");
-		player0Ref.on("child_changed", function(snapshot) {
-			if(snapshot.name() === 'solution') {
-				myEditor.getSession().setValue(snapshot.val());
+				var player1Ref = new Firebase(sessionRef.toString() + "/player1");
+				player1Ref.update({ user: userName, solution: myEditor.getSession().getValue()});
+				
+				var player0Ref = new Firebase(sessionRef.toString() + "/player0");
+				player0Ref.on("child_changed", function(snapshot) {
+					if(snapshot.name() === 'solution') {
+						myEditor.getSession().setValue(snapshot.val());
+					}
+				});
+				
+				friendEditor.getSession().on("change", function(e) {
+					player1Ref.update({solution: friendEditor.getSession().getValue()});
+				});
+			} else {
+				alert("Oops, the session id provided is not valid. Please ensure you have the correct session id from your friend!");
 			}
-		});
-		
-		friendEditor.getSession().on("change", function(e) {
-			player1Ref.update({solution: friendEditor.getSession().getValue()});
 		});
 	};
 
@@ -143,7 +169,7 @@ function verifierCtrl($scope, $resource) {
 			
 			data = {"solution": "", "tests": ""};
 			data.solution = $scope.solution;
-			data.tests = $scope.tests;
+			data.tests = $scope.playerTest;
 			
 			jsonrequest = btoa(JSON.stringify(data));
 			$scope.status = "Verifying your code";
@@ -153,19 +179,64 @@ function verifierCtrl($scope, $resource) {
 			}
 			
 			$scope.VerifierModel.get({'language':$scope.language, 'jsonrequest':jsonrequest}, 
-					function(response) {
-						if(response.solved) {
-							$scope.result = "Test Passed";
-							$('#result').addClass("label-success");
-						} else {
-							$scope.result = "Test Failed";
-							$('#result').addClass("label-important");
-						}
-					
-						$scope.status = "Verification completed";
+				function(response) {
+					$('#result').removeClass(cssClass);
+					if(response.solved) {
+						$scope.result = "Test Passed";
+						cssClass = "label-success";
+					} else {
+						$scope.result = "Test Failed";
+						cssClass = "label-important";
+					}
+				
+					$scope.status = "Verification completed";
+					$('#result').addClass(cssClass);
 			});
 		} else {
 			alert("Oops, there is nothing to verify. Please ensure you have generate or join a session!");
+		}
+	};
+	
+	$scope.verifyCompile = function() {
+		if($scope.session != undefined) {
+			var sessionRef = new Firebase(sessionListRef.toString() + "/" + $scope.session);
+			var player0Ref = new Firebase(sessionListRef.toString() + "/" + $scope.session + "/player0");
+			var player1Ref = new Firebase(sessionListRef.toString() + "/" + $scope.session + "/player1");
+			
+			player0Ref.child('solution').once('value', function(player0Solution) {
+				player1Ref.child('solution').once('value', function(player1Solution) {
+					sessionRef.child("test").once('value', function(questionTest) {
+						sessionRef.child("language").once('value', function(questionLanguage) {
+							$scope.$apply(function() {
+								var compiledSol = player0Solution.val() + "\n" + player1Solution.val();
+	
+								jsonrequest = btoa(JSON.stringify({"solution": compiledSol, "tests": questionTest.val()}));
+								
+								var lang = questionLanguage.val();
+								
+								if(lang == "javascript") {
+									lang = "js";
+								}
+								
+								$scope.VerifierModel.get({'language':lang, 'jsonrequest':jsonrequest}, 
+									function(response) {
+										$('#compiledResult').removeClass(cssClass);
+										if(response.solved) {
+											$scope.compiledResult = "Compiled Test Passed";
+											cssClass = "label-success";
+										} else {
+											$scope.compiledResult = "Compile Test Failed";
+											cssClass = "label-important";
+										}
+										$('#compiledResult').addClass(cssClass);
+								});
+							});
+						});
+					});
+				});
+			});
+		} else {
+			alert("Opps, we found no code to compile. Ensure you are in a session with your friend!");
 		}
 	};
 }
