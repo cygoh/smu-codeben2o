@@ -27,6 +27,7 @@ function mainCtrl($scope, $resource) {
 
 function verifierCtrl($scope, $resource) {
 	
+	var editor = null;
 	var myEditor = null;
 	var friendEditor = null;
 	
@@ -53,6 +54,7 @@ function verifierCtrl($scope, $resource) {
 		myEditor = ace.edit("my_editor");
 		myEditor.setTheme("ace/theme/twilight");
 		myEditor.setReadOnly(false);
+		editor = myEditor;
 
 		friendEditor = ace.edit("friend_editor");
 		friendEditor.setTheme("ace/theme/twilight");
@@ -83,15 +85,25 @@ function verifierCtrl($scope, $resource) {
 	
 	// Someone join the session as player 1
 	$scope.joinSession = function() {
-		var sessionID = prompt("Enter the session id:");
+		var sessionID = prompt("Paste your friend session id here:");
 		$scope.session = sessionID;
 		
 		var sessionRef = new Firebase(sessionListRef.toString() + "/" + sessionID);
 		
 		sessionRef.child('language').once('value', function(dataSnapShot) {
+			$scope.$apply(function() {
+				$scope.language = dataSnapShot.val();
+				// Set Ace editor with the appropriate language syntax and code snippet
+				myEditor.getSession().setMode("ace/mode/" + $scope.language);
+				friendEditor.getSession().setMode("ace/mode/" + $scope.language);
+			});
+			
 		});
 		
 		sessionRef.child('question').once('value', function(dataSnapShot) {
+			$scope.$apply(function() {
+				$scope.question = dataSnapShot.val();
+			});
 		});
 		
 		// Render Ace Editor
@@ -102,11 +114,8 @@ function verifierCtrl($scope, $resource) {
 		friendEditor = ace.edit("friend_editor");
 		friendEditor.setTheme("ace/theme/twilight");
 		friendEditor.setReadOnly(false);
-		
-		// Set Ace editor with the appropriate language syntax and code snippet
-		myEditor.getSession().setMode("ace/mode/" + "java");
-		friendEditor.getSession().setMode("ace/mode/" + "java");
-		
+		editor = friendEditor;
+
 		var player1Ref = new Firebase(sessionRef.toString() + "/player1");
 		player1Ref.update({ user: userName, solution: myEditor.getSession().getValue()});
 		
@@ -130,7 +139,7 @@ function verifierCtrl($scope, $resource) {
     // Function to handle on click event of "Verify your Code" button
 	$scope.verify = function() {
 		if($scope.session != undefined) {
-			$scope.solution = myEditor.getSession().getValue();
+			$scope.solution = editor.getSession().getValue();
 			
 			data = {"solution": "", "tests": ""};
 			data.solution = $scope.solution;
