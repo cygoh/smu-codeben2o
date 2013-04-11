@@ -1,0 +1,16 @@
+'use strict';
+
+/* Controllers */
+
+//angular.module("myApp", []);
+function FirstController($scope,$resource) {
+    $scope.company = "Code Ben2o";
+    
+    $scope.name = "Anonymous User";
+    
+    $scope.getuser = function(){
+    	//Used to retrieve user data - to be constructed.
+    };
+    
+    
+}
