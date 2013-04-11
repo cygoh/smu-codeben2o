@@ -47,9 +47,12 @@ function verifierCtrl($scope, $resource) {
 		// Re-initialize variable and remove css classes
 		$scope.result = "";
 		$scope.status = "";
+		$scope.friendResult = "";
 		$('#result').removeClass(cssClass);
 		$('#compiledResult').removeClass(cssClass);
 		$('#friendResult').removeClass(cssClass);
+		myEditor.getSession().setValue("");
+		friendEditor.getSession().setValue("");
 		
 		var sessionRef = sessionListRef.push();
 		
@@ -123,6 +126,8 @@ function verifierCtrl($scope, $resource) {
 				$('#result').removeClass(cssClass);
 				$('#compiledResult').removeClass(cssClass);
 				$('#friendResult').removeClass(cssClass);
+				myEditor.getSession().setValue("");
+				friendEditor.getSession().setValue("");
 				
 				$scope.session = sessionID;
 				player = "player1";
