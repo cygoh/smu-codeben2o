@@ -119,6 +119,7 @@ function verifierCtrl($scope, $resource) {
 				// Re-initialize variable and remove css classes
 				$scope.result = "";
 				$scope.status = "";
+				$scope.friendResult = "";
 				$('#result').removeClass(cssClass);
 				$('#compiledResult').removeClass(cssClass);
 				$('#friendResult').removeClass(cssClass);
@@ -226,16 +227,20 @@ function verifierCtrl($scope, $resource) {
 			$scope.VerifierModel.get({'language':$scope.language, 'jsonrequest':jsonrequest}, 
 				function(response) {
 					$('#result').removeClass(cssClass);
-					playerRef.update({ pass: response.solved });
+					
+					var solved = false;
 					
 					if(response.solved) {
 						$scope.result = "Test Passed";
 						cssClass = "label-success";
+						solved = true;
 					} else {
 						$scope.result = "Test Failed";
 						cssClass = "label-important";
 					}
-				
+					
+					playerRef.update({ pass: solved });
+					
 					$scope.status = "Verification completed";
 					$('#result').addClass(cssClass);
 			});
@@ -246,6 +251,8 @@ function verifierCtrl($scope, $resource) {
 	
 	$scope.verifyCompile = function() {
 		if($scope.session != undefined) {
+			$('#compiledResult').removeClass(cssClass);
+			
 			var sessionRef = new Firebase(sessionListRef.toString() + "/" + $scope.session);
 			var player0Ref = new Firebase(sessionListRef.toString() + "/" + $scope.session + "/player0");
 			var player1Ref = new Firebase(sessionListRef.toString() + "/" + $scope.session + "/player1");
@@ -267,7 +274,6 @@ function verifierCtrl($scope, $resource) {
 								
 								$scope.VerifierModel.get({'language':lang, 'jsonrequest':jsonrequest}, 
 									function(response) {
-										$('#compiledResult').removeClass(cssClass);
 										if(response.solved) {
 											$scope.compiledResult = "Test Passed";
 											cssClass = "label-success";
