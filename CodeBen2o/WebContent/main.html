@@ -102,7 +102,7 @@
 	    		<div class="well well-small">
 	    			<!--Body content-->
 	    			<div id="note" class="alert alert-success">
-	    				<p>Note: We support only Java and Javascript pair programming. There are only 1 problem set available as of now. We are in the process of adding more problem sets.  <a href="contact.html">Feedback</a> is greatly appreciated!</p>
+	    				<p>Note: We support only Java and Javascript pair programming. There are only 2 problem set available as of now. We are in the process of adding more problem sets.  <a href="contact.html">Feedback</a> is greatly appreciated!</p>
 	    				<hr>
 	    				<table>
 	    					<tr>
@@ -126,10 +126,11 @@
 	    				<p>Your task: {{playerTask}}</p>
 	    				<p>Category: {{language}}</p>
 		      			<p>Status: <span class="badge badge-warning">{{status}}</span></p>
-			  			<p>Individual Result: <span id="result" class="badge badge-warning">{{result}}</span></p>
-			  			<p>Compiled Result: <span id="compiledResult" class="badge badge-warning">{{compiledResult}}</span></p>
+			  			<p>Your Result: <span id="result" class="badge badge-warning">{{result}}</span></p>
+			  			<p>Friend's Result: <span id="friendResult" class="badge badge-warning">{{friendResult}}</span></p>
+			  			<p>Collaboration Result: <span id="compiledResult" class="badge badge-warning">{{compiledResult}}</span></p>
 			  			<p><a class="btn btn-warning btn-small" ng-click="verify()">Verify your code</a></p>
-			  			<p><a class="btn btn-warning btn-small" ng-click="verifyCompile()">Verify compiled code</a></p>
+			  			<p><a class="btn btn-warning btn-small" ng-click="verifyCompile()">Verify collaborative effort</a></p>
 			  			
 		  			</div>
 	    		</div>

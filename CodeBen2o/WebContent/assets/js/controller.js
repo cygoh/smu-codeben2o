@@ -2,6 +2,7 @@ angular.module('myApp', ['ngResource']);
 
 var userName = "";
 var cssClass = "";
+var player = "";
 
 function mainCtrl($scope, $resource) {
 	
@@ -35,7 +36,9 @@ function verifierCtrl($scope, $resource) {
 	// Initialize questions set
 	var questions = [{"language": "java", "challenge":"Write two method Hello and World respectively to print out Hello World", "player0Task": "Write a method called Hello() that return a string \"Hello\"", 
 		"player1Task": "Write a method called World that return a string \"World\"", "player0Test": "assertEquals(Hello(), \"Hello\")", "player1Test": "assertEquals(World(), \"World\")", 
-		"test": "assertEquals(Hello() + \" \" + World(), \"Hello World\");"}];
+		"test": "assertEquals(Hello() + \" \" + World(), \"Hello World\");"}, {"language": "javascript", "challenge": "Write two function Javascript and isAwesome respective to print out Javascript is Awesome", "player0Task": "Write a function called Javascript() that return a string \"Javascript\"",
+		"player1Task": "Write a function called isAwesome that return a string \"is Awesome\"", "player0Test": "assert_equal(Javascript(), \"Javascript\")", "player1Test": "assert_equal(isAwesome(), \"is Awesome\")",
+		"test": "assert_equal(Javascript() + \" \" + isAwesome(), \"Javascript is Awesome\")"}];
 	
 	var sessionListRef = new Firebase("https://codeben2o-collaborate.firebaseio.com/");
 	
@@ -46,10 +49,12 @@ function verifierCtrl($scope, $resource) {
 		$scope.status = "";
 		$('#result').removeClass(cssClass);
 		$('#compiledResult').removeClass(cssClass);
+		$('#friendResult').removeClass(cssClass);
 		
 		var sessionRef = sessionListRef.push();
 		
 		$scope.session = sessionRef.name();
+		player = "player0";
 		
 		// Get a random question from the question set
 		var randNum = Math.floor(Math.random()*questions.length);
@@ -75,17 +80,32 @@ function verifierCtrl($scope, $resource) {
 		sessionRef.set({ question: $scope.question, language: $scope.language, test: questions[randNum].test });
 		
 		var player0Ref = new Firebase(sessionRef.toString() + "/player0");
-		player0Ref.set({ user: userName, task: $scope.playerTask, solution: "" });
+		player0Ref.set({ user: userName, task: $scope.playerTask, solution: "", pass: "" });
 		
 		myEditor.getSession().on("change", function(e) {
 			player0Ref.update({solution: myEditor.getSession().getValue()});
 		});
 		
 		var player1Ref = new Firebase(sessionRef.toString() + "/player1");
-		player1Ref.set({ user: "", task: questions[randNum].player1Task, test: questions[randNum].player1Test, solution: "" });
+		player1Ref.set({ user: "", task: questions[randNum].player1Task, test: questions[randNum].player1Test, solution: "", pass: "" });
 		player1Ref.on("child_changed", function(snapshot) {
 			if(snapshot.name() === 'solution') {
 				friendEditor.getSession().setValue(snapshot.val());
+			} 
+			
+			if(snapshot.name() === 'pass') {
+				$scope.$apply(function() {
+					$('#friendResult').removeClass(cssClass);
+					if(snapshot.val()) {
+						$scope.friendResult = "Test Passed";
+						cssClass = "label-success";
+					}
+					else { 
+						$scope.friendResult = "Test Failed";
+						cssClass = "label-important";
+					}
+					$('#friendResult').addClass(cssClass);
+				});
 			}
 		});
 	};
@@ -96,7 +116,15 @@ function verifierCtrl($scope, $resource) {
 		
 		sessionListRef.child(sessionID).once('value', function(data) {
 			if(data.val() != null) {
+				// Re-initialize variable and remove css classes
+				$scope.result = "";
+				$scope.status = "";
+				$('#result').removeClass(cssClass);
+				$('#compiledResult').removeClass(cssClass);
+				$('#friendResult').removeClass(cssClass);
+				
 				$scope.session = sessionID;
+				player = "player1";
 				
 				var sessionRef = new Firebase(sessionListRef.toString() + "/" + sessionID);
 				
@@ -146,6 +174,21 @@ function verifierCtrl($scope, $resource) {
 					if(snapshot.name() === 'solution') {
 						myEditor.getSession().setValue(snapshot.val());
 					}
+					
+					if(snapshot.name() === 'pass') {
+						$scope.$apply(function() {
+							$('#friendResult').removeClass(cssClass);
+							if(snapshot.val()) {
+								$scope.friendResult = "Test Passed";
+								cssClass = "label-success";
+							}
+							else { 
+								$scope.friendResult = "Test Failed";
+								cssClass = "label-important";
+							}
+							$('#friendResult').addClass(cssClass);
+						});
+					}
 				});
 				
 				friendEditor.getSession().on("change", function(e) {
@@ -165,6 +208,8 @@ function verifierCtrl($scope, $resource) {
     // Function to handle on click event of "Verify your Code" button
 	$scope.verify = function() {
 		if($scope.session != undefined) {
+			var playerRef = new Firebase(sessionListRef.toString() + "/" + $scope.session + "/" + player);
+			
 			$scope.solution = editor.getSession().getValue();
 			
 			data = {"solution": "", "tests": ""};
@@ -181,6 +226,8 @@ function verifierCtrl($scope, $resource) {
 			$scope.VerifierModel.get({'language':$scope.language, 'jsonrequest':jsonrequest}, 
 				function(response) {
 					$('#result').removeClass(cssClass);
+					playerRef.update({ pass: response.solved });
+					
 					if(response.solved) {
 						$scope.result = "Test Passed";
 						cssClass = "label-success";
@@ -222,10 +269,10 @@ function verifierCtrl($scope, $resource) {
 									function(response) {
 										$('#compiledResult').removeClass(cssClass);
 										if(response.solved) {
-											$scope.compiledResult = "Compiled Test Passed";
+											$scope.compiledResult = "Test Passed";
 											cssClass = "label-success";
 										} else {
-											$scope.compiledResult = "Compile Test Failed";
+											$scope.compiledResult = "Test Failed";
 											cssClass = "label-important";
 										}
 										$('#compiledResult').addClass(cssClass);
